@@ -1,6 +1,8 @@
+import { NavigationStackProp } from 'react-navigation-stack';
+
 export type RootStackParamList = {
-  Root: undefined;
-  NotFound: undefined;
+  Home: undefined;
+  Auth: undefined;
 };
 
 export type BottomTabParamList = {
@@ -14,4 +16,9 @@ export type TabOneParamList = {
 
 export type TabTwoParamList = {
   TabTwoScreen: undefined;
+};
+
+export type Props = {
+  navigation: NavigationStackProp<{ userId: string }>;
+  route: NavigationStackProp<{ userId: string }>;
 };
