@@ -6,16 +6,21 @@ export type RootStackParamList = {
 };
 
 export type BottomTabParamList = {
-  TabOne: undefined;
-  TabTwo: undefined;
+  Queue: undefined;
+  Playlists: undefined;
+  Search: undefined;
 };
 
-export type TabOneParamList = {
-  TabOneScreen: undefined;
+export type QueueParamList = {
+  Queue: undefined;
 };
 
-export type TabTwoParamList = {
-  TabTwoScreen: undefined;
+export type PlaylistParamList = {
+  Playlists: undefined;
+};
+
+export type SearchParamList = {
+  Search: undefined;
 };
 
 export type Props = {
