@@ -14,9 +14,8 @@ export const SongsModal = ({ playlist, modalVisible, setModalVisible }: any) => 
     }, []);
 
     const getSongs = async() => {
-        const data = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data.items
-        console.log(data);
-        // setSongs(items);
+        const items = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data.items;
+        setSongs(items);
     };
 
     return (
@@ -31,7 +30,7 @@ export const SongsModal = ({ playlist, modalVisible, setModalVisible }: any) => 
 
             <ScrollView>
                 {
-                    songs.map((song: any) => <SongsCard key={ song.id } song={ song } />)
+                    songs.length !== 0 && songs.map((song: any, index: number) => <SongsCard key={ index } song={ song.track } />)
                 }
             </ScrollView>
         </Modal>

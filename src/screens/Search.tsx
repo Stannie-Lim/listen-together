@@ -1,7 +1,7 @@
 import { AxiosHttpRequest } from '../utils/axios';
 import React, { useEffect, useState } from 'react';
 import { getUserId, getUser } from '../utils/axios';
-import { ScrollView, View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, TextInput } from 'react-native';
+import { Button, ScrollView, View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, TextInput } from 'react-native';
 
 import { SongsCard } from '../screens/cards/SongsCard';
 
@@ -10,15 +10,14 @@ export default function Search() {
   const [ searchTerm, setSearchTerm ] = useState('');
 
   const search = async(text: string) => {
-    setSearchTerm(text)
-    const data = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/search?q=${searchTerm}&type=track&market=US`))?.data.tracks;
-    // console.log(data);
-    // setFound(items);
+    const data = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchTerm)}&type=track&market=US`))?.data.tracks.items;
+    setFound(data);
   };
 
   return (
     <View style={styles.container}>
-      <TextInput style={ styles.input } value={ searchTerm } onChangeText={ search } autoCorrect={ false } autoCapitalize='none' />
+      <TextInput style={ styles.input } value={ searchTerm } onChangeText={ text => setSearchTerm(text) } autoCorrect={ false } autoCapitalize='none' />
+      <Button onPress={ search } title='press' />
       <ScrollView>
         {
           found.length !== 0 && found.map(song => <SongsCard song={ song } /> )
