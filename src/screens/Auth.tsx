@@ -16,7 +16,11 @@ const Auth = ({ route, navigation }: Props)  => {
 
             const token = (await AxiosHttpRequest('POST', `${API_URL}/auth/login`, { code, url }))?.data;
 
+            
             await setJwt(token.access_token);
+            const me = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/me`))?.data;
+            await AxiosHttpRequest('POST', `${API_URL}/user`, { id: me.id });
+            
             navigation.navigate('Home');
           } catch (err) {
             console.log(err)

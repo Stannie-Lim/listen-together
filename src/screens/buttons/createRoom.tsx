@@ -1,15 +1,23 @@
 import { Props } from '../../../types';
+import { API_URL } from '../../../secrets';
 import React, { useEffect, useState } from 'react';
-import { AxiosHttpRequest } from '../../utils/axios';
-import { getUserId, getUser } from '../../utils/axios';
+import { AxiosHttpRequest, getUser } from '../../utils/axios';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions  } from 'react-native';
 
 // modals
 import { CreateRoomModal } from '../modals/createRoomModal';
 
-export const CreateRoom = ({ navigation }: Props) => {   
+export const CreateRoom = ({ navigation }: Props) => { 
+    const [ me, setMe ] = useState({ id: 0 });
+    
+    useEffect( () => {
+        const getMe = async() => getUser(setMe);
+        getMe();
+    }, []);
+
     const createRoom = async() => {
-        navigation.navigate('Room');
+        const { roomCode } = (await AxiosHttpRequest('POST', `${API_URL}/room`, { id: me.id } ))?.data;
+        navigation.navigate('Room', { roomCode });
     };
 
     return (

@@ -17,7 +17,8 @@ import { MaterialIcons, SimpleLineIcons, AntDesign } from '@expo/vector-icons';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
-export default function BottomTabNavigator() {
+export default function BottomTabNavigator({route}: any) {
+  const { roomCode } = route.params;
   const colorScheme = useColorScheme();
 
   return (
@@ -26,25 +27,30 @@ export default function BottomTabNavigator() {
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
         name="Queue"
-        component={TabOneNavigator}
         options={{
           tabBarIcon: ({ color }) => <MaterialIcons name="queue-music" size={24} color={color} />,
         }}
-      />
+      >
+        { ({ navigation }: any) => <TabOneNavigator navigation={ navigation } roomCode={ roomCode } /> }
+      </BottomTab.Screen>
+
       <BottomTab.Screen
         name="Playlists"
-        component={TabTwoNavigator}
         options={{
           tabBarIcon: ({ color }) => <SimpleLineIcons name="playlist" size={24} color={color} />
         }}
-      />
+      >
+        { ({ navigation }: any) => <TabTwoNavigator navigation={ navigation } roomCode={ roomCode } /> }
+      </BottomTab.Screen>
+
       <BottomTab.Screen
         name="Search"
-        component={TabThreeNavigator}
         options={{
           tabBarIcon: ({ color }) => <AntDesign name="search1" size={24} color={color} />
         }}
-      />
+      >
+        { ({ navigation }: any) => <TabThreeNavigator navigation={ navigation } roomCode={ roomCode } /> }
+      </BottomTab.Screen>
     </BottomTab.Navigator>
   );
 }
@@ -59,14 +65,14 @@ function TabBarIcon(props: { name: string; color: string }) {
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
 const TabOneStack = createStackNavigator<QueueParamList>();
 
-function TabOneNavigator({ navigation }: Props) {
+function TabOneNavigator({ navigation, roomCode }: Props) {
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
         name="Queue"
         component={Queue}
         options={{ 
-          headerTitle: 'Room Code',
+          headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
             <TouchableOpacity onPress={ () => navigation.pop() }>
               <Text>Leave Room</Text>
@@ -80,14 +86,14 @@ function TabOneNavigator({ navigation }: Props) {
 
 const TabTwoStack = createStackNavigator<PlaylistParamList>();
 
-function TabTwoNavigator({ navigation }: Props) {
+function TabTwoNavigator({ navigation, roomCode }: Props) {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
         name="Playlists"
         component={Playlists}
         options={{ 
-          headerTitle: 'Room Code',
+          headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
             <TouchableOpacity onPress={ () => navigation.pop() }>
               <Text>Leave Room</Text>
@@ -101,14 +107,14 @@ function TabTwoNavigator({ navigation }: Props) {
 
 const TabThreeStack = createStackNavigator<SearchParamList>();
 
-function TabThreeNavigator({ navigation }: Props) {
+function TabThreeNavigator({ navigation, roomCode }: Props) {
   return (
     <TabThreeStack.Navigator>
       <TabThreeStack.Screen
         name="Search"
         component={Search}
         options={{ 
-          headerTitle: 'Room Code',
+          headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
             <TouchableOpacity onPress={ () => navigation.pop() }>
               <Text>Leave Room</Text>

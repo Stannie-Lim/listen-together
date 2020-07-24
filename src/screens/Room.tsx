@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { getUserId, getUser } from '../utils/axios';
 import { View, Text } from 'react-native';
 
-export const Room = () => {
+export const Room = ({ roomCode }: any) => {
   const [ playlists, setPlaylists ] = useState([]);
   const [ me, setMe ] = useState({});
   useEffect( () => {

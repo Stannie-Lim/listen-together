@@ -10,17 +10,17 @@ export default function Search() {
   const [ searchTerm, setSearchTerm ] = useState('');
 
   const search = async(text: string) => {
-    const data = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchTerm)}&type=track&market=US`))?.data.tracks.items;
-    setFound(data);
+    const { items } = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchTerm)}&type=track&market=US`))?.data.tracks;
+    setFound(items);
   };
 
   return (
     <View style={styles.container}>
       <TextInput style={ styles.input } value={ searchTerm } onChangeText={ text => setSearchTerm(text) } autoCorrect={ false } autoCapitalize='none' />
-      <Button onPress={ search } title='press' />
+      <Button onPress={ search } title='Search' />
       <ScrollView>
         {
-          found.length !== 0 && found.map(song => <SongsCard song={ song } /> )
+          found.length !== 0 && found.map((song: any, index: number) => <SongsCard key={ index } song={ song } /> )
         }
       </ScrollView>
     </View>

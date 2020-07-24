@@ -14,7 +14,7 @@ export const SongsModal = ({ playlist, modalVisible, setModalVisible }: any) => 
     }, []);
 
     const getSongs = async() => {
-        const items = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data.items;
+        const {items} = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data;
         setSongs(items);
     };
 
