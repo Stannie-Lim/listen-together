@@ -7,7 +7,7 @@ import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Modal, StyleShe
 import { DoneButton } from './DoneButton';
 import { SongsCard } from '../cards/SongsCard';
 
-export const SongsModal = ({ playlist, modalVisible, setModalVisible }: any) => {
+export const SongsModal = ({ queue, setQueue, playlist, modalVisible, setModalVisible }: any) => {
     const [ songs, setSongs ] = useState([]);
     useEffect( () => {
         getSongs();
@@ -30,7 +30,7 @@ export const SongsModal = ({ playlist, modalVisible, setModalVisible }: any) => 
 
             <ScrollView>
                 {
-                    songs.length !== 0 && songs.map((song: any, index: number) => <SongsCard key={ index } song={ song.track } />)
+                    songs.length !== 0 && songs.map((song: any, index: number) => <SongsCard key={ index } song={ song.track } queue={ queue } setQueue={ setQueue } clickable={ true } />)
                 }
             </ScrollView>
         </Modal>

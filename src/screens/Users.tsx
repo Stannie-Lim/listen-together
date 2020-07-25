@@ -7,7 +7,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 // cards
 import { UserCard } from './cards/UserCard';
 
-export default function Users({ roomCode }: any) {
+export default function Users({ queue, setQueue, roomCode }: any) {
   const [ users, setUsers ] = useState([]);
   useEffect( () => {
     const getUsers = async() => {

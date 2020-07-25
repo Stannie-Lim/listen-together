@@ -32,4 +32,6 @@ export type Props = {
   navigation: NavigationStackProp<{ userId: string }>;
   route: NavigationStackProp<{ userId: string }>;
   roomCode: string;
+  queue: undefined;
+  setQueue: undefined;
 };

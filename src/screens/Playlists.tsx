@@ -7,7 +7,7 @@ import { Text, View } from '../components/Themed';
 // components
 import { PlaylistCard } from './cards/PlaylistCard';
 
-export default function Playlists() {
+export default function Playlists({ queue, setQueue }: any) {
   const [ playlists, setPlaylists ] = useState([]);
   const [ me, setMe ] = useState({});
   useEffect( () => {
@@ -25,7 +25,7 @@ export default function Playlists() {
     <View style={styles.container}>
       <ScrollView>
         {
-          playlists.map((playlist: any) => <PlaylistCard key={ playlist.id } playlist={ playlist } /> )
+          playlists.map((playlist: any) => <PlaylistCard key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
         }
       </ScrollView>
     </View>
