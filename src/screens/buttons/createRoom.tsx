@@ -4,9 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { AxiosHttpRequest, getUser } from '../../utils/axios';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions  } from 'react-native';
 
-// modals
-import { CreateRoomModal } from '../modals/createRoomModal';
-
 export const CreateRoom = ({ navigation }: Props) => { 
     const [ me, setMe ] = useState({ id: 0 });
     
@@ -16,7 +13,8 @@ export const CreateRoom = ({ navigation }: Props) => {
     }, []);
 
     const createRoom = async() => {
-        const { roomCode } = (await AxiosHttpRequest('POST', `${API_URL}/room`, { id: me.id } ))?.data;
+        const roomCode = (await AxiosHttpRequest('POST', `${API_URL}/room`, { id: me.id } ))?.data.id;
+        await AxiosHttpRequest('POST', `${API_URL}/user/join/${roomCode}`, { id: me.id });
         navigation.navigate('Room', { roomCode });
     };
 

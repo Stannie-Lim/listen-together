@@ -1,18 +1,23 @@
+import { Props } from '../../../types';
 import { StyleSheet } from 'react-native';
 import { AxiosHttpRequest } from '../../utils/axios';
 import React, { useEffect, useState } from 'react';
 import { getUserId, getUser } from '../../utils/axios';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 
-export const JoinRoom = () => {
-    const joinRoom = async() => {
+// modals
+import { JoinRoomModal } from '../modals/JoinRoomModal';
 
-    };
+export const JoinRoom = ({ navigation }: Props) => {
+    const [ modalVisible, setModalVisible ] = useState(false);
+
     return (
         <View style={ styles.container }>
-            <TouchableOpacity onPress={ joinRoom } style={ styles.buttons }>
+            <TouchableOpacity onPress={ () => setModalVisible(true) } style={ styles.buttons }>
                 <Text style={ styles.center }>Join an existing room</Text>
             </TouchableOpacity>
+
+            <JoinRoomModal modalVisible={ modalVisible } setModalVisible={ setModalVisible } navigation={ navigation } />
         </View>
     );
 }

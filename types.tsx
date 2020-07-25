@@ -9,6 +9,7 @@ export type BottomTabParamList = {
   Queue: undefined;
   Playlists: undefined;
   Search: undefined;
+  Users: undefined;
 };
 
 export type QueueParamList = {
@@ -21,6 +22,10 @@ export type PlaylistParamList = {
 
 export type SearchParamList = {
   Search: undefined;
+};
+
+export type UsersParamList = {
+  Users: undefined;
 };
 
 export type Props = {

@@ -5,15 +5,16 @@ import { TouchableOpacity, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import Colors from '../constants/Colors';
-import useColorScheme from '../hooks/useColorScheme';
+import Users from '../screens/Users';
 import Queue from '../screens/Queue';
-import Playlists from '../screens/Playlists';
 import Search from '../screens/Search';
-import { BottomTabParamList, QueueParamList, PlaylistParamList, SearchParamList } from '../../types';
+import Colors from '../constants/Colors';
+import Playlists from '../screens/Playlists';
+import useColorScheme from '../hooks/useColorScheme';
+import { BottomTabParamList, QueueParamList, PlaylistParamList, SearchParamList, UsersParamList } from '../../types';
 
 // icons
-import { MaterialIcons, SimpleLineIcons, AntDesign } from '@expo/vector-icons'; 
+import { MaterialIcons, SimpleLineIcons, AntDesign, Feather } from '@expo/vector-icons'; 
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -51,6 +52,15 @@ export default function BottomTabNavigator({route}: any) {
       >
         { ({ navigation }: any) => <TabThreeNavigator navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
+
+      <BottomTab.Screen
+        name="Users"
+        options={{
+          tabBarIcon: ({ color }) => <Feather name="users" size={24} color={color} />
+        }}
+      >
+        { ({ navigation }: any) => <TabFourNavigator navigation={ navigation } roomCode={ roomCode } /> }
+      </BottomTab.Screen>
     </BottomTab.Navigator>
   );
 }
@@ -60,6 +70,10 @@ export default function BottomTabNavigator({route}: any) {
 function TabBarIcon(props: { name: string; color: string }) {
   return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
 }
+
+const leaveRoom = (navigation: any) => {
+  navigation.pop();
+};
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
@@ -74,7 +88,7 @@ function TabOneNavigator({ navigation, roomCode }: Props) {
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
-            <TouchableOpacity onPress={ () => navigation.pop() }>
+            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
               <Text>Leave Room</Text>
             </TouchableOpacity>
           )
@@ -95,7 +109,7 @@ function TabTwoNavigator({ navigation, roomCode }: Props) {
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
-            <TouchableOpacity onPress={ () => navigation.pop() }>
+            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
               <Text>Leave Room</Text>
             </TouchableOpacity>
           )
@@ -116,12 +130,34 @@ function TabThreeNavigator({ navigation, roomCode }: Props) {
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
           headerLeft: () => (
-            <TouchableOpacity onPress={ () => navigation.pop() }>
+            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
               <Text>Leave Room</Text>
             </TouchableOpacity>
           )
         }}
       />
     </TabThreeStack.Navigator>
+  );
+}
+
+const TabFourStack = createStackNavigator<UsersParamList>();
+
+function TabFourNavigator({ navigation, roomCode }: Props) {
+  return (
+    <TabFourStack.Navigator>
+      <TabFourStack.Screen
+        name="Users"
+        options={{ 
+          headerTitle: `Room Code: ${roomCode}`,
+          headerLeft: () => (
+            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
+              <Text>Leave Room</Text>
+            </TouchableOpacity>
+          )
+        }}
+      >
+        { () => <Users roomCode={ roomCode } /> }
+      </TabFourStack.Screen>
+    </TabFourStack.Navigator>
   );
 }

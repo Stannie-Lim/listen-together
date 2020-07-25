@@ -1,13 +1,12 @@
 import { AxiosHttpRequest } from '../../utils/axios';
 import React, { useEffect, useState } from 'react';
 import { getUserId, getUser } from '../../utils/axios';
-import { SafeAreaView, View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions  } from 'react-native';
+import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions  } from 'react-native';
 
 // components
 import { DoneButton } from './DoneButton';
 
-export const CreateRoomModal = ({ Component, modalVisible, setModalVisible }: any) => {
-
+export const CustomModal = ({ Component, modalVisible, setModalVisible }: any) => {
     return (
         <Modal
             animationType="slide"
@@ -17,7 +16,7 @@ export const CreateRoomModal = ({ Component, modalVisible, setModalVisible }: an
             }}
         >
             <DoneButton setModalVisible={ setModalVisible } />
-            {/* <Component /> */}
+            <Component />>
         </Modal>
     );
 }

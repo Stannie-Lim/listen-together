@@ -12,7 +12,7 @@ export const RoomEntrance = ({ navigation }: Props) => {
   return (
     <View style={styles.container}>
         <CreateRoom navigation={ navigation } />
-        <JoinRoom />
+        <JoinRoom navigation={ navigation } />
     </View>
   );
 }
