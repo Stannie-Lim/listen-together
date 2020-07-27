@@ -114,7 +114,7 @@ function TabTwoNavigator({ queue, setQueue, navigation, roomCode }: Props) {
           )
         }}
       >
-        { () => <Playlists queue={ queue } setQueue={ setQueue } /> }
+        { () => <Playlists queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabTwoStack.Screen>
     </TabTwoStack.Navigator>
   );
