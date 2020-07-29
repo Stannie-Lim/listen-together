@@ -14,7 +14,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import { BottomTabParamList, QueueParamList, PlaylistParamList, SearchParamList, UsersParamList } from '../../types';
 
 // queue implementation
-import Queue from '../Queue/Queue';
+import Queue from '../custom/Queue';
 
 // icons
 import { MaterialIcons, SimpleLineIcons, AntDesign, Feather } from '@expo/vector-icons'; 
