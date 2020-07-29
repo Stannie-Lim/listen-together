@@ -5,23 +5,21 @@ import { getUserId, getUser } from '../../utils/axios';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
 
 // modals
-import { SongsModal } from '../modals/SongsModal';
+import { IntersectionSongsModal } from '../modals/IntersectionSongsModal';
 import { Avatar } from '../common/Avatar';
 
-export const PlaylistCard = ({ queue, setQueue, playlist }: any) => {   
-    console.log(playlist);
+export const IntersectionPlaylistCard = ({ queue, setQueue, playlist }: any) => { 
     const [ modalVisible, setModalVisible ] = useState(false);
-
-    const imageUri = playlist.images[0].url !== null ? playlist.images[0].url : ""
+    const imageUri = playlist[0] && playlist[0].track.album.images[0].url !== null ? playlist[0].track.album.images[0].url : ""
 
     return (
         <TouchableOpacity onPress={ () => setModalVisible(true) } style={ styles.container }>
             <Avatar imageUri={ imageUri } />
             <View style={ styles.information }>
-                <Text>{ playlist.name }</Text>
-                <Text>Tracks: { playlist.tracks.total }</Text>
+                <Text>Intersection Playlist</Text>
+                <Text>Tracks: { playlist.length }</Text>
             </View>
-            <SongsModal queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
+            <IntersectionSongsModal queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
         </TouchableOpacity>
     );
 }

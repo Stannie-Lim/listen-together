@@ -7,16 +7,15 @@ import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Modal, StyleShe
 import { DoneButton } from './DoneButton';
 import { SongsCard } from '../cards/SongsCard';
 
-export const SongsModal = ({ queue, setQueue, playlist, modalVisible, setModalVisible }: any) => {
+export const IntersectionSongsModal = ({ queue, setQueue, playlist, modalVisible, setModalVisible }: any) => {
     const [ songs, setSongs ] = useState([]);
     useEffect( () => {
         getSongs();
     }, []);
 
     const getSongs = async() => {
-        const data = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data.items
-        console.log(data, 'hello');
-        setSongs(data);
+        const {items} = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data;
+        setSongs(items);
     };
 
     return (
@@ -31,7 +30,7 @@ export const SongsModal = ({ queue, setQueue, playlist, modalVisible, setModalVi
 
             <ScrollView>
                 {
-                    songs.length !== 0 && songs.map((song: any, index: number) => <SongsCard key={ index } song={ song.track } queue={ queue } setQueue={ setQueue } clickable={ true } />)
+                    playlist.length && playlist.map((song: any, index: number) => <SongsCard key={ index } song={ song.track } queue={ queue } setQueue={ setQueue } clickable={ true } />)
                 }
             </ScrollView>
         </Modal>

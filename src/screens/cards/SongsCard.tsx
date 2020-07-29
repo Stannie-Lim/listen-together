@@ -8,7 +8,6 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 import { Avatar } from '../common/Avatar';
 
 export const SongsCard = ({ clickable, queue, setQueue, song }: any) => {
-    console.log(song.name);
     const enqueueSong = () => {
         queue.enqueue(song);
         setQueue(queue);

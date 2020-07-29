@@ -7,12 +7,15 @@ import { Text, View } from '../components/Themed';
 
 // components
 import { PlaylistCard } from './cards/PlaylistCard';
+import { SongsCard } from './cards/SongsCard';
+import { IntersectionPlaylistCard } from './cards/IntersectionPlaylistCard';
 
 // custom classes
 import ObjectSet from '../custom/ObjectSet';
 
 export default function Playlists({ queue, setQueue, roomCode }: any) {
-  const [ playlists, setPlaylists ] = useState([]);
+  const [ intersectionPlaylist, setIntersectionPlaylist ]: any[] = useState([]);
+  const [ playlists, setPlaylists ]: any[] = useState([]);
   const [ me, setMe ] = useState({});
   useEffect( () => {
     getme();
@@ -23,63 +26,71 @@ export default function Playlists({ queue, setQueue, roomCode }: any) {
   const getPlaylists = async() => {
     const combinedSongs: any[] = [];
     const userIds = (await AxiosHttpRequest('GET', `${API_URL}/room/${roomCode}`))?.data.users.map((user: any) => user.id);
-    userIds.forEach(user => {
+
+    const { items }: any = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/playlists'))?.data;
+    setPlaylists(items);
+
+    userIds.forEach((user: any) => {
       const findPlaylists = async() => {
-        const userPlaylists = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/users/${user}/playlists`))?.data.items.map(playlist => playlist.id);
+
+        const userPlaylists = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/users/${user}/playlists`))?.data.items.map((playlist: any) => playlist.id);
 
         const usersSongs = [];
         for(let i = 0; i < userPlaylists.length; i++) {
           const playlistSongs = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/playlists/${userPlaylists[i]}`))?.data.tracks.items;
           usersSongs.push(playlistSongs);
         }
-
         combinedSongs.push(usersSongs.flat(1));
-         
-        const removeDupesFromObjects = arr => {
-          const removed = [];
-          arr.forEach(song => {
-            let found = false;
-            for(let i = 0; i < removed.length; i++) {
-              if(removed[i].track.id === song.track.id) {
-                found = true;
-                break;
-              }
-            }
-            if(!found) removed.push(song);
-          });
-          return removed;
-        };
-
-        const nodupes = [];
-        for(let i = 0; i < combinedSongs.length; i++) {
-          nodupes.push(removeDupesFromObjects(combinedSongs[i]));
-        }
-
-        const getIntersection = arr => {
-          const set = new ObjectSet();
-          const intersection: any[] = [];
-          arr.forEach((playlist: any) => {
-            playlist.forEach((song: any) => {
-              const found = set.add(song);
-              if(found) intersection.push(song);
-            })
-          })
-          return intersection;
-        }
-
+        const nodupes = removeDupes(combinedSongs);
         const intersection = getIntersection(nodupes);
-        intersection.forEach(song => console.log(song.track.name));
-
+        setIntersectionPlaylist(intersection);
       }
       findPlaylists();
     });
   };
 
+  const removeDupes = (combinedSongs: any) => {
+    const removeDupesFromObjects = (arr: any) => {
+      const removed: any = [];
+      arr.forEach((song: any) => {
+        let found = false;
+        for(let i = 0; i < removed.length; i++) {
+          if(removed[i].track.id === song.track.id) {
+            found = true;
+            break;
+          }
+        }
+        if(!found) removed.push(song);
+      });
+      return removed;
+    };
+    const nodupes = [];
+    for(let i = 0; i < combinedSongs.length; i++) {
+      nodupes.push(removeDupesFromObjects(combinedSongs[i]));
+    }
+    return nodupes;
+  }
+
+  const getIntersection = (arr: any) => {
+    const set = new ObjectSet();
+    const intersection: any[] = [];
+    arr.forEach((playlist: any) => {
+      playlist.forEach((song: any) => {
+        const found = set.add(song);
+        if(found) intersection.push(song);
+      })
+    })
+    return intersection;
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView>
         {
-          playlists.map((playlist: any) => <PlaylistCard key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
+          playlists.length !== 0 && playlists.map((playlist: any) => <PlaylistCard key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
+        }
+        {
+          intersectionPlaylist.length !== 0 && <IntersectionPlaylistCard playlist={ intersectionPlaylist } queue={ queue } setQueue={ setQueue } />
         }
       </ScrollView>
     </View>
