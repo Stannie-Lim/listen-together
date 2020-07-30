@@ -7,6 +7,7 @@ import { StyleSheet, Text, SafeAreaView, View, TouchableOpacity, TextInput, Dime
 import axios from 'axios';
 
 const Auth = ({ route, navigation }: Props)  => {
+    
     const login = async() => {
         try {
             const url = AuthSession.getRedirectUrl();
@@ -14,12 +15,16 @@ const Auth = ({ route, navigation }: Props)  => {
             const result: any = await AuthSession.startAsync({ authUrl })
             const { code } = result.params;
 
+            console.log(1);
             const token = (await AxiosHttpRequest('POST', `${API_URL}/auth/login`, { code, url }))?.data;
-
+            console.log(2);
             
             await setJwt(token.access_token);
+            console.log(3);
             const me = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/me`))?.data;
+            console.log(4);
             await AxiosHttpRequest('POST', `${API_URL}/user`, { id: me.id });
+            console.log(5);
             
             navigation.navigate('Home');
           } catch (err) {
