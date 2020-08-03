@@ -1,30 +1,42 @@
 import { Props } from '../../types';
-import React, { useState } from 'react';
-import { API_URL, CLIENT_ID } from '../../secrets';
+import React, { useState, useEffect } from 'react';
+import { SOCKET_URL, API_URL, CLIENT_ID } from '../../secrets';
 import { AxiosHttpRequest, setJwt, setUserId } from '../utils/axios';
 import * as AuthSession from 'expo-auth-session';
 import { StyleSheet, Text, SafeAreaView, View, TouchableOpacity, TextInput, Dimensions } from 'react-native';
 import axios from 'axios';
+import io from 'socket.io-client';
+
+
+// sockets
+// import socket from '../sockets/room';
 
 const Auth = ({ route, navigation }: Props)  => {
-    
+    let socket: any;
+    useEffect( () => {
+        socket = io(SOCKET_URL);
+        socket.connect();
+
+        socket.on("connect", () => {
+            console.log("Connected!");
+        });
+
+        socket.emit("message", {"hello": "saada"});
+    }, []);
     const login = async() => {
+        socket.emit('room', { 'hello': '123' });
         try {
             const url = AuthSession.getRedirectUrl();
             const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(url)}`;
             const result: any = await AuthSession.startAsync({ authUrl })
             const { code } = result.params;
 
-            console.log(1);
             const token = (await AxiosHttpRequest('POST', `${API_URL}/auth/login`, { code, url }))?.data;
-            console.log(2);
             
+
             await setJwt(token.access_token);
-            console.log(3);
             const me = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/me`))?.data;
-            console.log(4);
             await AxiosHttpRequest('POST', `${API_URL}/user`, { id: me.id });
-            console.log(5);
             
             navigation.navigate('Home');
           } catch (err) {

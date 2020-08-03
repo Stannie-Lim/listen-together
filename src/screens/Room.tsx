@@ -1,8 +1,12 @@
+import { API_URL, SOCKET_URL } from '../../secrets';
 import { StyleSheet } from 'react-native';
 import { AxiosHttpRequest } from '../utils/axios';
 import React, { useEffect, useState } from 'react';
 import { getUserId, getUser } from '../utils/axios';
 import { View, Text } from 'react-native';
+
+// sockets
+import '../sockets/room';
 
 export const Room = ({ roomCode }: any) => {
   const [ playlists, setPlaylists ] = useState([]);
