@@ -9,7 +9,7 @@ import { SongsModal } from '../modals/SongsModal';
 import { Avatar } from '../common/Avatar';
 
 export const PlaylistCard = ({ queue, setQueue, playlist }: any) => {   
-    console.log(playlist);
+    // console.log(playlist);
     const [ modalVisible, setModalVisible ] = useState(false);
 
     const imageUri = playlist.images[0].url !== null ? playlist.images[0].url : ""

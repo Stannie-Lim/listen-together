@@ -7,22 +7,14 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 // cards
 import { UserCard } from './cards/UserCard';
 
-export default function Users({ queue, setQueue, roomCode }: any) {
-  const [ users, setUsers ] = useState([]);
-  useEffect( () => {
-    const getUsers = async() => {
-      const { data }: any = (await AxiosHttpRequest('GET', `${API_URL}/room/${roomCode}`));
-      setUsers(data.users);
-    }
-    getUsers();
-  }, []);
-
+export default function Users({ socket, queue, setQueue, roomCode, users }: any) {
+  // console.log(users);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Users</Text>
       <ScrollView>
         {
-          users.map((user: any) => <UserCard key={ user.id } user={ user } /> )
+          users && users.map((user: any) => <UserCard key={ user.id } user={ user } /> )
         }
       </ScrollView>
     </View>

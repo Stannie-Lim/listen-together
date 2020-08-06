@@ -10,7 +10,6 @@ import { DoneButton } from './DoneButton';
 export const JoinRoomModal = ({ navigation, modalVisible, setModalVisible }: any) => {
     const [ me, setMe ] = useState({ id: 0 });
     const [ roomCode, setRoomCode ] = useState('');
-    console.log(navigation);
 
     useEffect( () => {
         const getMe = async() => getUser(setMe);

@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import io from 'socket.io-client';
 import { Props } from '../../types';
+import { AxiosHttpRequest } from '../utils/axios';
+import { API_URL, SOCKET_URL } from '../../secrets';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -24,9 +27,38 @@ const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 export default function BottomTabNavigator({route}: any) {
   const { roomCode } = route.params;
   const [ queue, setQueue ] = useState(new Queue());
+  const [ me, setMe ] = useState({});
+  const [ socket, setSocket ] = useState({});
+  const [ users, setUsers ]: any[] = useState([]);
+  
+  let mysocket: any;
+  useEffect( () => {
+    const getUser = async() => {
+      const { data } = (await AxiosHttpRequest('GET', `${API_URL}/auth/me`));
+      return data;
+    }
+    mysocket = io(SOCKET_URL);
+
+    mysocket.on('newuser', async data => {
+      const userids = (await AxiosHttpRequest('GET', `${API_URL}/room/${roomCode}`))?.data.users;
+      const usersInRoom: any[] = [];
+      for(let i = 0; i < userids.length; i++) {
+        const { id } = userids[i];
+        const userObj = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/users/${id}`))?.data;
+        usersInRoom.push(userObj);
+      }
+      console.log(usersInRoom);
+      setUsers(usersInRoom);
+    });
+
+    getUser().then(user => {
+      mysocket.emit('joinroom', { roomCode, user });
+      setMe(user);
+      setSocket(mysocket);
+    });
+  }, []);
 
   const colorScheme = useColorScheme();
-
   return (
     <BottomTab.Navigator
       initialRouteName="Queue"
@@ -37,7 +69,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <MaterialIcons name="queue-music" size={24} color={color} />,
         }}
       >
-        { ({ navigation }: any) => <TabOneNavigator queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabOneNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -46,7 +78,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <SimpleLineIcons name="playlist" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabTwoNavigator queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabTwoNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -55,7 +87,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <AntDesign name="search1" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabThreeNavigator queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabThreeNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -64,7 +96,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <Feather name="users" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabFourNavigator queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabFourNavigator users={ users } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
     </BottomTab.Navigator>
   );
@@ -78,7 +110,7 @@ const leaveRoom = (navigation: any) => {
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
 const TabOneStack = createStackNavigator<QueueParamList>();
 
-function TabOneNavigator({ queue, setQueue, navigation, roomCode }: Props) {
+function TabOneNavigator({ user, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
@@ -92,7 +124,7 @@ function TabOneNavigator({ queue, setQueue, navigation, roomCode }: Props) {
           )
         }}
       >
-        { () => <QueueScreen queue={ queue } setQueue={ setQueue } /> }
+        { () => <QueueScreen user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } /> }
       </TabOneStack.Screen>
     </TabOneStack.Navigator>
   );
@@ -100,7 +132,7 @@ function TabOneNavigator({ queue, setQueue, navigation, roomCode }: Props) {
 
 const TabTwoStack = createStackNavigator<PlaylistParamList>();
 
-function TabTwoNavigator({ queue, setQueue, navigation, roomCode }: Props) {
+function TabTwoNavigator({ user, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
@@ -114,7 +146,7 @@ function TabTwoNavigator({ queue, setQueue, navigation, roomCode }: Props) {
           )
         }}
       >
-        { () => <Playlists queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
+        { () => <Playlists user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabTwoStack.Screen>
     </TabTwoStack.Navigator>
   );
@@ -122,7 +154,7 @@ function TabTwoNavigator({ queue, setQueue, navigation, roomCode }: Props) {
 
 const TabThreeStack = createStackNavigator<SearchParamList>();
 
-function TabThreeNavigator({ queue, setQueue, navigation, roomCode }: Props) {
+function TabThreeNavigator({ user, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabThreeStack.Navigator>
       <TabThreeStack.Screen
@@ -136,7 +168,7 @@ function TabThreeNavigator({ queue, setQueue, navigation, roomCode }: Props) {
           )
         }}
       >
-        { () => <Search queue={ queue } setQueue={ setQueue } /> }
+        { () => <Search user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } /> }
       </TabThreeStack.Screen>
     </TabThreeStack.Navigator>
   );
@@ -144,7 +176,7 @@ function TabThreeNavigator({ queue, setQueue, navigation, roomCode }: Props) {
 
 const TabFourStack = createStackNavigator<UsersParamList>();
 
-function TabFourNavigator({ queue, setQueue, navigation, roomCode }: Props) {
+function TabFourNavigator({ users, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabFourStack.Navigator>
       <TabFourStack.Screen
@@ -158,7 +190,7 @@ function TabFourNavigator({ queue, setQueue, navigation, roomCode }: Props) {
           )
         }}
       >
-        { () => <Users queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
+        { () => <Users users={ users } socket={ socket } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabFourStack.Screen>
     </TabFourStack.Navigator>
   );

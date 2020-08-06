@@ -1,17 +1,26 @@
-import { API_URL, SOCKET_URL } from '../../secrets';
+import io from 'socket.io-client';
 import { StyleSheet } from 'react-native';
 import { AxiosHttpRequest } from '../utils/axios';
 import React, { useEffect, useState } from 'react';
-import { getUserId, getUser } from '../utils/axios';
+import { API_URL, SOCKET_URL } from '../../secrets';
+import { getUser } from '../utils/axios';
 import { View, Text } from 'react-native';
 
 // sockets
-import '../sockets/room';
+// import '../sockets/room';
 
 export const Room = ({ roomCode }: any) => {
   const [ playlists, setPlaylists ] = useState([]);
   const [ me, setMe ] = useState({});
+  let socket: any;
+
   useEffect( () => {
+    socket = io(SOCKET_URL);
+    socket.connect();
+    console.log(socket);
+    socket.on("connect", () => {
+      console.log("Connected!");
+    });
     getme();
     getPlaylists();
   }, []);
@@ -19,7 +28,7 @@ export const Room = ({ roomCode }: any) => {
   const getme = async() => await getUser(setMe);
   const getPlaylists = async() => {
     const { data }: any = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/playlists')) ;
-    console.log(data);
+    // console.log(data);
   };
 
   return (

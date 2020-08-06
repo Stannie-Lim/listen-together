@@ -6,8 +6,10 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 // cards
 import { SongsCard } from './cards/SongsCard';
 
-export default function QueueScreen({ queue, setQueue }: any) {
-  console.log(queue.queue.length);
+export default function QueueScreen({ socket, queue, setQueue }: any) {
+  useEffect( () => {
+    
+  }, []);
   return (
     <View>
       <Text style={styles.title}>Queue</Text>

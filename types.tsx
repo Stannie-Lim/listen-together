@@ -34,4 +34,6 @@ export type Props = {
   roomCode: string;
   queue: undefined;
   setQueue: undefined;
+  socket: undefined;
+  users: undefined;
 };
