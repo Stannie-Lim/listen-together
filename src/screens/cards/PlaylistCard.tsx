@@ -8,7 +8,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 import { SongsModal } from '../modals/SongsModal';
 import { Avatar } from '../common/Avatar';
 
-export const PlaylistCard = ({ queue, setQueue, playlist }: any) => {   
+export const PlaylistCard = ({ enqueueSong, queue, setQueue, playlist }: any) => {   
     // console.log(playlist);
     const [ modalVisible, setModalVisible ] = useState(false);
 
@@ -21,7 +21,7 @@ export const PlaylistCard = ({ queue, setQueue, playlist }: any) => {
                 <Text>{ playlist.name }</Text>
                 <Text>Tracks: { playlist.tracks.total }</Text>
             </View>
-            <SongsModal queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
+            <SongsModal enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
         </TouchableOpacity>
     );
 }

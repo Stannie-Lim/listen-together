@@ -17,7 +17,6 @@ export const Room = ({ roomCode }: any) => {
   useEffect( () => {
     socket = io(SOCKET_URL);
     socket.connect();
-    console.log(socket);
     socket.on("connect", () => {
       console.log("Connected!");
     });

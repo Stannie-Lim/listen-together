@@ -7,16 +7,14 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 import { SongsCard } from './cards/SongsCard';
 
 export default function QueueScreen({ socket, queue, setQueue }: any) {
-  useEffect( () => {
-    
-  }, []);
+  console.log(queue);
   return (
     <View>
       <Text style={styles.title}>Queue</Text>
       <Text>{queue.queue.length !== 0 && <SongsCard clickable={ false } song={queue.peek()} queue={ queue } setQueue={ setQueue } />}</Text>
       <ScrollView>
         {
-            queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => index !== 0 ? <SongsCard key={ index } clickable={ false } song={ song } queue={ queue } setQueue={ setQueue } /> : <Text></Text>)
+            queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => index !== 0 ? <SongsCard key={ index } clickable={ false } song={ song } queue={ queue } setQueue={ setQueue } /> : <Text></Text>)
         } 
       </ScrollView>
     </View>

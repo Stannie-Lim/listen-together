@@ -1,8 +1,8 @@
 import io from 'socket.io-client';
 import { Props } from '../../types';
+import { Ionicons } from '@expo/vector-icons';
 import { AxiosHttpRequest } from '../utils/axios';
 import { API_URL, SOCKET_URL } from '../../secrets';
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,39 +24,56 @@ import { MaterialIcons, SimpleLineIcons, AntDesign, Feather } from '@expo/vector
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
+const mysocket = io(SOCKET_URL);
+
 export default function BottomTabNavigator({route}: any) {
   const { roomCode } = route.params;
   const [ queue, setQueue ] = useState(new Queue());
   const [ me, setMe ] = useState({});
-  const [ socket, setSocket ] = useState({});
   const [ users, setUsers ]: any[] = useState([]);
   
-  let mysocket: any;
-  useEffect( () => {
-    const getUser = async() => {
-      const { data } = (await AxiosHttpRequest('GET', `${API_URL}/auth/me`));
-      return data;
-    }
-    mysocket = io(SOCKET_URL);
-
-    mysocket.on('newuser', async data => {
-      const userids = (await AxiosHttpRequest('GET', `${API_URL}/room/${roomCode}`))?.data.users;
+  const getUsers = async() => {
+    const userids = (await AxiosHttpRequest('GET', `${API_URL}/room/${roomCode}`))?.data.users;
       const usersInRoom: any[] = [];
       for(let i = 0; i < userids.length; i++) {
         const { id } = userids[i];
         const userObj = (await AxiosHttpRequest('GET', `https://api.spotify.com/v1/users/${id}`))?.data;
         usersInRoom.push(userObj);
       }
-      console.log(usersInRoom);
       setUsers(usersInRoom);
+  };
+
+  useEffect( () => {
+    const getUser = async() => {
+      const { data } = (await AxiosHttpRequest('GET', `${API_URL}/auth/me`));
+      return data;
+    }
+
+    mysocket.on('newuser', data => {
+      getUsers();
+    });
+
+    mysocket.on('queue', songqueue => {
+      setQueue(songqueue);
     });
 
     getUser().then(user => {
       mysocket.emit('joinroom', { roomCode, user });
       setMe(user);
-      setSocket(mysocket);
     });
+
+    return () => {
+      mysocket.disconnect();
+      getUsers();
+    }
   }, []);
+
+  const enqueueSong = async song => {
+    queue.enqueue(song);
+    const newqueue = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue }));
+    setQueue(newqueue);
+    mysocket.emit('queuesong', newqueue);
+  };
 
   const colorScheme = useColorScheme();
   return (
@@ -69,7 +86,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <MaterialIcons name="queue-music" size={24} color={color} />,
         }}
       >
-        { ({ navigation }: any) => <TabOneNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabOneNavigator user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -78,7 +95,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <SimpleLineIcons name="playlist" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabTwoNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabTwoNavigator enqueueSong={ enqueueSong } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -87,7 +104,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <AntDesign name="search1" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabThreeNavigator user={ me } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabThreeNavigator user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -96,7 +113,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <Feather name="users" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabFourNavigator users={ users } socket={ socket } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabFourNavigator users={ users } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
     </BottomTab.Navigator>
   );
@@ -124,7 +141,7 @@ function TabOneNavigator({ user, socket, queue, setQueue, navigation, roomCode }
           )
         }}
       >
-        { () => <QueueScreen user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } /> }
+        { () => <QueueScreen user={ user } queue={ queue } setQueue={ setQueue } /> }
       </TabOneStack.Screen>
     </TabOneStack.Navigator>
   );
@@ -132,7 +149,7 @@ function TabOneNavigator({ user, socket, queue, setQueue, navigation, roomCode }
 
 const TabTwoStack = createStackNavigator<PlaylistParamList>();
 
-function TabTwoNavigator({ user, socket, queue, setQueue, navigation, roomCode }: Props) {
+function TabTwoNavigator({ enqueueSong, user, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
@@ -146,7 +163,7 @@ function TabTwoNavigator({ user, socket, queue, setQueue, navigation, roomCode }
           )
         }}
       >
-        { () => <Playlists user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
+        { () => <Playlists enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabTwoStack.Screen>
     </TabTwoStack.Navigator>
   );
@@ -168,7 +185,7 @@ function TabThreeNavigator({ user, socket, queue, setQueue, navigation, roomCode
           )
         }}
       >
-        { () => <Search user={ user } socket={ socket } queue={ queue } setQueue={ setQueue } /> }
+        { () => <Search user={ user } queue={ queue } setQueue={ setQueue } /> }
       </TabThreeStack.Screen>
     </TabThreeStack.Navigator>
   );
@@ -190,7 +207,7 @@ function TabFourNavigator({ users, socket, queue, setQueue, navigation, roomCode
           )
         }}
       >
-        { () => <Users users={ users } socket={ socket } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
+        { () => <Users users={ users } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabFourStack.Screen>
     </TabFourStack.Navigator>
   );

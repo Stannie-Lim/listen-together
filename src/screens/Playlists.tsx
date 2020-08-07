@@ -13,7 +13,7 @@ import { IntersectionPlaylistCard } from './cards/IntersectionPlaylistCard';
 // custom classes
 import ObjectSet from '../custom/ObjectSet';
 
-export default function Playlists({ queue, setQueue, roomCode }: any) {
+export default function Playlists({ enqueueSong, socket, queue, setQueue, roomCode }: any) {
   const [ intersectionPlaylist, setIntersectionPlaylist ]: any[] = useState([]);
   const [ playlists, setPlaylists ]: any[] = useState([]);
   const [ me, setMe ] = useState({});
@@ -43,6 +43,7 @@ export default function Playlists({ queue, setQueue, roomCode }: any) {
         combinedSongs.push(usersSongs.flat(1));
         const nodupes = removeDupes(combinedSongs);
         const intersection = getIntersection(nodupes);
+
         setIntersectionPlaylist(intersection);
       }
       findPlaylists();
@@ -87,10 +88,10 @@ export default function Playlists({ queue, setQueue, roomCode }: any) {
     <View style={styles.container}>
       <ScrollView>
         {
-          playlists.length !== 0 && playlists.map((playlist: any) => <PlaylistCard key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
+          playlists.length !== 0 && playlists.map((playlist: any) => <PlaylistCard enqueueSong={ enqueueSong } key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
         }
         {
-          intersectionPlaylist.length !== 0 && <IntersectionPlaylistCard playlist={ intersectionPlaylist } queue={ queue } setQueue={ setQueue } />
+          intersectionPlaylist.length !== 0 && <IntersectionPlaylistCard enqueueSong={ enqueueSong } playlist={ intersectionPlaylist } queue={ queue } setQueue={ setQueue } />
         }
       </ScrollView>
     </View>
