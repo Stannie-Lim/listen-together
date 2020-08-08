@@ -17,7 +17,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import { BottomTabParamList, QueueParamList, PlaylistParamList, SearchParamList, UsersParamList } from '../../types';
 
 // queue implementation
-import Queue from '../custom/Queue';
+import SongQueue from '../custom/Queue';
 
 // icons
 import { MaterialIcons, SimpleLineIcons, AntDesign, Feather } from '@expo/vector-icons'; 
@@ -28,7 +28,7 @@ const mysocket = io(SOCKET_URL);
 
 export default function BottomTabNavigator({route}: any) {
   const { roomCode } = route.params;
-  const [ queue, setQueue ] = useState(new Queue());
+  const [ queue, setQueue ] = useState(new SongQueue);
   const [ me, setMe ] = useState({});
   const [ users, setUsers ]: any[] = useState([]);
   
@@ -54,7 +54,8 @@ export default function BottomTabNavigator({route}: any) {
     });
 
     mysocket.on('queue', songqueue => {
-      setQueue(songqueue);
+      const newqueue = new SongQueue(songqueue);
+      setQueue(newqueue);
     });
 
     getUser().then(user => {
@@ -70,7 +71,8 @@ export default function BottomTabNavigator({route}: any) {
 
   const enqueueSong = async song => {
     queue.enqueue(song);
-    const newqueue = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue }));
+    const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
+    const newqueue = new SongQueue(JSON.parse(songQueue));
     setQueue(newqueue);
     mysocket.emit('queuesong', newqueue);
   };

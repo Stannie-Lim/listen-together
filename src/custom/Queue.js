@@ -1,6 +1,7 @@
-export default class Queue {
-    constructor() {
+export default class SongQueue {
+    constructor(queue) {
         this.queue = [];
+        if(queue) this.queue = queue;
     }
     
     peek() {

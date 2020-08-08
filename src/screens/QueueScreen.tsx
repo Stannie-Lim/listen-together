@@ -6,15 +6,15 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 // cards
 import { SongsCard } from './cards/SongsCard';
 
-export default function QueueScreen({ socket, queue, setQueue }: any) {
-  console.log(queue);
+export default function QueueScreen({ queue, setQueue }: any) {
+  console.log(queue.queue, 'helol');
   return (
     <View>
       <Text style={styles.title}>Queue</Text>
-      <Text>{queue.queue.length !== 0 && <SongsCard clickable={ false } song={queue.peek()} queue={ queue } setQueue={ setQueue } />}</Text>
-      <ScrollView>
+      { queue.queue.length !== 0 && <SongsCard clickable={ false } song={queue.peek()} />}
+      <ScrollView style={ styles.list }>
         {
-            queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => index !== 0 ? <SongsCard key={ index } clickable={ false } song={ song } queue={ queue } setQueue={ setQueue } /> : <Text></Text>)
+          queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => index !== 0 ? <SongsCard key={ index } clickable={ false } song={ song } /> : <Text></Text>)
         } 
       </ScrollView>
     </View>
@@ -36,4 +36,7 @@ const styles = StyleSheet.create({
     height: 1,
     width: '80%',
   },
+  list: {
+    height: '80%',
+  }
 });

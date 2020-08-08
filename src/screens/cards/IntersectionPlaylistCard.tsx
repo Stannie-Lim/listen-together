@@ -8,7 +8,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 import { IntersectionSongsModal } from '../modals/IntersectionSongsModal';
 import { Avatar } from '../common/Avatar';
 
-export const IntersectionPlaylistCard = ({ queue, setQueue, playlist }: any) => { 
+export const IntersectionPlaylistCard = ({ enqueueSong, queue, setQueue, playlist }: any) => { 
     const [ modalVisible, setModalVisible ] = useState(false);
     const imageUri = playlist[0] && playlist[0].track.album.images[0].url !== null ? playlist[0].track.album.images[0].url : ""
 
@@ -19,7 +19,7 @@ export const IntersectionPlaylistCard = ({ queue, setQueue, playlist }: any) => 
                 <Text>Intersection Playlist</Text>
                 <Text>Tracks: { playlist.length }</Text>
             </View>
-            <IntersectionSongsModal queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
+            <IntersectionSongsModal enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
         </TouchableOpacity>
     );
 }

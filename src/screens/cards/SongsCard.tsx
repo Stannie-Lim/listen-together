@@ -8,7 +8,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 import { Avatar } from '../common/Avatar';
 
 export const SongsCard = ({ enqueueSong, clickable, queue, setQueue, song }: any) => {
-
+    console.log(song);
     const imageUri = song.album.images[0].url !== null ? song.album.images[0].url : ""
     return (
         clickable ? 
