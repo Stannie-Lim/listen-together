@@ -17,9 +17,15 @@ export const JoinRoomModal = ({ navigation, modalVisible, setModalVisible }: any
     }, []);
 
     const joinRoom = async() => {
-        const code = (await AxiosHttpRequest('POST', `${API_URL}/user/join/${roomCode}`, { id: me.id }))?.data.roomId;
-        setModalVisible(false);
-        navigation.navigate('Room', { roomCode: code });
+        try {
+            const code = (await AxiosHttpRequest('POST', `${API_URL}/user/join/${roomCode}`, { id: me.id }))?.data.roomId;
+            setModalVisible(false);
+            navigation.navigate('Room', { roomCode: code });
+            setRoomCode('');
+        } catch(err) {
+            alert(`Room code ${roomCode} does not exist`);
+            setRoomCode('');
+        }
     };
 
     return (

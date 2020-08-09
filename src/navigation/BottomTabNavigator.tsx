@@ -68,6 +68,10 @@ export default function BottomTabNavigator({route}: any) {
       setIntersectionPlaylist(intersection);
     });
 
+    mysocket.on('disconnect', async () => {
+      await getUsers();
+    });
+
     getUser().then(user => {
       mysocket.emit('joinroom', { roomCode, user });
       setMe(user);
@@ -89,6 +93,10 @@ export default function BottomTabNavigator({route}: any) {
 
   const emitIntersection = intersection => {
     mysocket.emit('foundintersection', intersection);
+  };
+
+  const leaveSocket = () => {
+    mysocket.emit('leaveroom');
   };
 
   const getPlaylists = async() => {
@@ -164,7 +172,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <MaterialIcons name="queue-music" size={24} color={color} />,
         }}
       >
-        { ({ navigation }: any) => <TabOneNavigator user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabOneNavigator leaveSocket={ leaveSocket } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -173,7 +181,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <SimpleLineIcons name="playlist" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabTwoNavigator playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabTwoNavigator leaveSocket={ leaveSocket } playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -182,7 +190,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <AntDesign name="search1" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabThreeNavigator user={ me } enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabThreeNavigator leaveSocket={ leaveSocket } user={ me } enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -191,32 +199,38 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <Feather name="users" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabFourNavigator users={ users } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabFourNavigator leaveSocket={ leaveSocket } user={ me } users={ users } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
     </BottomTab.Navigator>
   );
 }
 
-const leaveRoom = (navigation: any) => {
-  navigation.pop();
-};
+const leaveRoom = (navigation: any, id: string, leaveSocket: any) => {
+  const leave = async() => {
+    navigation.pop();
+    await AxiosHttpRequest('POST', `${API_URL}/user/leave`, { id });
+    leaveSocket();
+  }
+
+  return (
+    <TouchableOpacity onPress={ () => leave() }>
+      <Text>Leave Room</Text>
+    </TouchableOpacity>
+  );
+}
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
 const TabOneStack = createStackNavigator<QueueParamList>();
 
-function TabOneNavigator({ user, socket, queue, setQueue, navigation, roomCode }: Props) {
+function TabOneNavigator({ leaveSocket, user, socket, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
         name="Queue"
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
-          headerLeft: () => (
-            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
-              <Text>Leave Room</Text>
-            </TouchableOpacity>
-          )
+          headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
         { () => <QueueScreen user={ user } queue={ queue } setQueue={ setQueue } /> }
@@ -227,18 +241,14 @@ function TabOneNavigator({ user, socket, queue, setQueue, navigation, roomCode }
 
 const TabTwoStack = createStackNavigator<PlaylistParamList>();
 
-function TabTwoNavigator({ playlists, intersectionPlaylist, emitIntersection, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
+function TabTwoNavigator({ leaveSocket, playlists, intersectionPlaylist, emitIntersection, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
         name="Playlists"
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
-          headerLeft: () => (
-            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
-              <Text>Leave Room</Text>
-            </TouchableOpacity>
-          )
+          headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
         { () => <Playlists playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
@@ -249,18 +259,14 @@ function TabTwoNavigator({ playlists, intersectionPlaylist, emitIntersection, en
 
 const TabThreeStack = createStackNavigator<SearchParamList>();
 
-function TabThreeNavigator({ enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
+function TabThreeNavigator({ leaveSocket, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabThreeStack.Navigator>
       <TabThreeStack.Screen
         name="Search"
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
-          headerLeft: () => (
-            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
-              <Text>Leave Room</Text>
-            </TouchableOpacity>
-          )
+          headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
         { () => <Search enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } /> }
@@ -271,18 +277,14 @@ function TabThreeNavigator({ enqueueSong, user, queue, setQueue, navigation, roo
 
 const TabFourStack = createStackNavigator<UsersParamList>();
 
-function TabFourNavigator({ users, socket, queue, setQueue, navigation, roomCode }: Props) {
+function TabFourNavigator({ user, leaveSocket, users, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabFourStack.Navigator>
       <TabFourStack.Screen
         name="Users"
         options={{ 
           headerTitle: `Room Code: ${roomCode}`,
-          headerLeft: () => (
-            <TouchableOpacity onPress={ () => leaveRoom(navigation) }>
-              <Text>Leave Room</Text>
-            </TouchableOpacity>
-          )
+          headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
         { () => <Users users={ users } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
