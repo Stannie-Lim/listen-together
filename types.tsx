@@ -36,4 +36,7 @@ export type Props = {
   setQueue: undefined;
   socket: undefined;
   users: undefined;
+  enqueueSong: undefined;
+  user: undefined;
+  emitIntersection: undefined;
 };

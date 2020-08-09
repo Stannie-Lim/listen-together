@@ -14,7 +14,6 @@ export const IntersectionSongsModal = ({ enqueueSong, queue, setQueue, playlist,
     }, []);
 
     const getSongs = async() => {
-        console.log(playlist);
         const {items} = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data;
         setSongs(items);
     };

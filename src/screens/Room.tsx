@@ -18,7 +18,7 @@ export const Room = ({ roomCode }: any) => {
     socket = io(SOCKET_URL);
     socket.connect();
     socket.on("connect", () => {
-      console.log("Connected!");
+      // console.log("Connected!");
     });
     getme();
     getPlaylists();

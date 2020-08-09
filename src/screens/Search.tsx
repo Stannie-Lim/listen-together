@@ -5,7 +5,7 @@ import { Button, ScrollView, View, Text, TouchableOpacity, Modal, StyleSheet, Di
 
 import { SongsCard } from '../screens/cards/SongsCard';
 
-export default function Search({ queue, setQueue }: any) {
+export default function Search({ enqueueSong, queue, setQueue }: any) {
   const [ found, setFound ] = useState([]);
   const [ searchTerm, setSearchTerm ] = useState('');
 
@@ -20,7 +20,7 @@ export default function Search({ queue, setQueue }: any) {
       <Button onPress={ search } title='Search' />
       <ScrollView>
         {
-          found.length !== 0 && found.map((song: any, index: number) => <SongsCard key={ index } song={ song } queue={ queue } setQueue={ setQueue } clickable={ true } /> )
+          found.length !== 0 && found.map((song: any, index: number) => <SongsCard key={ index } enqueueSong={ enqueueSong }  song={ song } queue={ queue } setQueue={ setQueue } clickable={ true } /> )
         }
       </ScrollView>
     </View>

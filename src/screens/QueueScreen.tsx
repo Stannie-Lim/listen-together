@@ -7,7 +7,6 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 import { SongsCard } from './cards/SongsCard';
 
 export default function QueueScreen({ queue, setQueue }: any) {
-  console.log(queue.queue, 'helol');
   return (
     <View>
       <Text style={styles.title}>Queue</Text>
