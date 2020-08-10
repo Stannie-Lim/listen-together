@@ -1,5 +1,5 @@
 import React from 'react';
-import { ColorSchemeName } from 'react-native';
+import { ColorSchemeName, TouchableOpacity, Text } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 
 // screens
@@ -32,7 +32,14 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Auth" component={Auth} />
-      <Stack.Screen name="Home" component={RoomEntrance} />
+      <Stack.Screen name="Home" component={RoomEntrance} 
+        // options={{ 
+        //   title: 'hello',
+        //   headerRight: () => <TouchableOpacity onPress={ () => console.log('hello') }>
+        //                       <Text>Log out</Text>
+        //                      </TouchableOpacity>
+        // }}
+      />
       <Stack.Screen name="Room" component={BottomTabNavigator} />
     </Stack.Navigator>
   );

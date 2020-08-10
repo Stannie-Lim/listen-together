@@ -8,8 +8,10 @@ import { SongsCard } from './cards/SongsCard';
 
 export default function QueueScreen({ queue, setQueue }: any) {
   return (
+    queue.queue.length === 0 ?
+    <Text style={styles.title}>There are no songs in the queue right now!</Text>
+    :
     <View>
-      <Text style={styles.title}>Queue</Text>
       { queue.queue.length !== 0 && <SongsCard clickable={ false } song={queue.peek()} />}
       <ScrollView style={ styles.list }>
         {

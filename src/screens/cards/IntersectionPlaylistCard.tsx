@@ -15,8 +15,9 @@ export const IntersectionPlaylistCard = ({ enqueueSong, queue, setQueue, playlis
     return (
         <TouchableOpacity onPress={ () => setModalVisible(true) } style={ styles.container }>
             <Avatar imageUri={ imageUri } />
-            <View style={ styles.information }>
+            <View>
                 <Text>Intersection Playlist</Text>
+                <Text style={ styles.text }>A new playlist with all the songs everyone here has in common!</Text>
                 <Text>Tracks: { playlist.length }</Text>
             </View>
             <IntersectionSongsModal enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } playlist={ playlist } modalVisible={ modalVisible } setModalVisible={ setModalVisible } />
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
         width: 100,
         borderRadius: 50,
     },
-    information: {
-
-    },
+    text: {
+        width: Dimensions.get('window').width / 1.5
+    }
 });

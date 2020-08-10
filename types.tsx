@@ -3,6 +3,7 @@ import { NavigationStackProp } from 'react-navigation-stack';
 export type RootStackParamList = {
   Home: undefined;
   Auth: undefined;
+  Room: undefined;
 };
 
 export type BottomTabParamList = {
