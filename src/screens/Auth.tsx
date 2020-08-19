@@ -12,21 +12,10 @@ import io from 'socket.io-client';
 // import socket from '../sockets/room';
 
 const Auth = ({ route, navigation }: Props)  => {
-    let socket: any;
-    useEffect( () => {
-        // socket = io(SOCKET_URL);
-        // socket.connect();
-
-        // socket.on("connect", () => {
-        //     console.log("Connected!");
-        // });
-
-        // socket.emit("message", {"hello": "saada"});
-    }, []);
     const login = async() => {
         try {
             const url = AuthSession.getRedirectUrl();
-            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(url)}`;
+            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&scope=${encodeURIComponent('user-modify-playback-state user-read-playback-state')}&redirect_uri=${encodeURIComponent(url)}`;
             const result: any = await AuthSession.startAsync({ authUrl })
             const { code } = result.params;
 
