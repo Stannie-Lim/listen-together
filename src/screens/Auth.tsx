@@ -37,7 +37,7 @@ const Auth = ({ route, navigation }: Props)  => {
             <View style={ styles.container }>
                 {/* <TextInput style={ styles.input } value={ username } onChange={ ({ target }: { target: value }) => setUsername(target.value) } placeholder='Username' />  */}
                 <TouchableOpacity onPress={ login }>
-                    <Text>Login</Text>
+                    <Text style={ {color: 'green'} }>Login</Text>
                 </TouchableOpacity>
 
             </View>

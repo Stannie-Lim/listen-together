@@ -85,41 +85,42 @@ export default function BottomTabNavigator({route}: any) {
   }, []);
 
   const enqueueSong = async song => {
-    //play song
-    console.log(song.uri);
-    Audio.setAudioModeAsync({ 
-      playsInSilentModeIOS: true
-    });
-    const soundObject = new Audio.Sound();
-    try {
-      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-      await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player', { device_ids: [device.id] });
-      const currentSong = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player'))?.data;
-      const playing = currentSong.item.uri === song.uri;
-      let temp = false;
-      console.log(playing);
-      if(!playing) {
-        await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: [song.uri], device_id: device.id } )
-        console.log('hello');
-      } else {
-        await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player/pause');
-        temp = true;
-      }
+    // //play song
+    // console.log(song.uri);
+    // Audio.setAudioModeAsync({ 
+    //   playsInSilentModeIOS: true
+    // });
+    // const soundObject = new Audio.Sound();
+    // try {
+    //   const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+    //   const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+    //   await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player', { device_ids: [device.id] });
+    //   const currentSong = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player'))?.data;
+    //   const playing = currentSong.item.uri === song.uri;
+    //   let temp = false;
+    //   console.log(playing);
+    //   if(!playing) {
+    //     await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: [song.uri], device_id: device.id } )
+    //     console.log('hello');
+    //   } else {
+    //     await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player/pause');
+    //     temp = true;
+    //   }
 
-      if(temp) {
-        await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`);
-        temp = false;
-      }
+    //   if(temp) {
+    //     await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`);
+    //     temp = false;
+    //   }
 
 
-    } catch(err) {
-      console.log(Object.entries(err));
-    }
+    // } catch(err) {
+    //   console.log(Object.entries(err));
+    // }
 
     queue.enqueue(song);
     const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
     const newqueue = new SongQueue(JSON.parse(songQueue));
+    
     setQueue(newqueue);
     mysocket.emit('queuesong', newqueue);
   };

@@ -6,19 +6,29 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView
 // cards
 import { SongsCard } from './cards/SongsCard';
 
+// components
+import { Playing } from './cards/Playing';
+
 export default function QueueScreen({ queue, setQueue }: any) {
   return (
     queue.queue.length === 0 ?
-    <Text style={styles.title}>There are no songs in the queue right now!</Text>
-    :
     <View>
-      { queue.queue.length !== 0 && <SongsCard clickable={ false } song={queue.peek()} />}
-      <ScrollView style={ styles.list }>
-        {
-          queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => index !== 0 ? <SongsCard key={ index } clickable={ false } song={ song } /> : <Text></Text>)
-        } 
-      </ScrollView>
+      <Text style={styles.title}>There are no songs in the queue right now!</Text>
+      {/* <View style={ styles.playing }>
+        <Playing />
+      </View> */}
     </View>
+    :
+      <View>
+        <ScrollView style={ styles.list }>
+          {
+            queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => <SongsCard key={ index } clickable={ false } song={ song } />)
+          } 
+        </ScrollView>
+        <View style={ styles.playing }>
+          <Playing song={ queue.peek() } queue={ queue } />
+        </View>
+      </View>
   );
 }
 
@@ -38,6 +48,9 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   list: {
-    height: '80%',
+    height: '85%',
+  },
+  playing: {
+
   }
 });
