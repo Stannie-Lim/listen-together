@@ -10,15 +10,15 @@ import { PlaylistCard } from './cards/PlaylistCard';
 import { SongsCard } from './cards/SongsCard';
 import { IntersectionPlaylistCard } from './cards/IntersectionPlaylistCard';
 
-export default function Playlists({ playlists, intersectionPlaylist, emitIntersection, enqueueSong, socket, queue, setQueue, roomCode }: any) {
+export default function Playlists({ playlists, intersectionPlaylist, enqueuePlaylist, enqueueSong, socket, queue, setQueue, roomCode }: any) {
   return (
     <View style={styles.container}>
       <ScrollView>
         {
-          playlists.length !== 0 && playlists.map((playlist: any) => <PlaylistCard enqueueSong={ enqueueSong } key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
+          playlists.length !== 0 && playlists.map((playlist: any) => <PlaylistCard enqueuePlaylist={ enqueuePlaylist } enqueueSong={ enqueueSong } key={ playlist.id } playlist={ playlist } queue={ queue } setQueue={ setQueue } /> )
         }
         {
-          intersectionPlaylist.length !== 0 && <IntersectionPlaylistCard enqueueSong={ enqueueSong } playlist={ intersectionPlaylist } queue={ queue } setQueue={ setQueue } />
+          intersectionPlaylist.length !== 0 && <IntersectionPlaylistCard enqueuePlaylist={ enqueuePlaylist } enqueueSong={ enqueueSong } playlist={ intersectionPlaylist } queue={ queue } setQueue={ setQueue } />
         }
       </ScrollView>
     </View>

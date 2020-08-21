@@ -10,6 +10,15 @@ import { SongsCard } from './cards/SongsCard';
 import { Playing } from './cards/Playing';
 
 export default function QueueScreen({ queue, setQueue }: any) {
+  useEffect( () => {
+    findPlaying();
+  }, []);
+  const findPlaying = async() => {
+      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+      console.log(device);
+
+  };
   return (
     queue.queue.length === 0 ?
     <View>

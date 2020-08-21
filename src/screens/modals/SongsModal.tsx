@@ -7,18 +7,7 @@ import { ScrollView, SafeAreaView, View, Text, TouchableOpacity, Modal, StyleShe
 import { DoneButton } from './DoneButton';
 import { SongsCard } from '../cards/SongsCard';
 
-export const SongsModal = ({ enqueueSong, queue, setQueue, playlist, modalVisible, setModalVisible }: any) => {
-    const [ songs, setSongs ] = useState([]);
-    useEffect( () => {
-        getSongs();
-    }, []);
-
-    const getSongs = async() => {
-        const data = (await AxiosHttpRequest('GET', playlist.tracks.href))?.data.items
-        // console.log(data, 'hello');
-        setSongs(data);
-    };
-
+export const SongsModal = ({ songs, enqueueSong, queue, setQueue, modalVisible, setModalVisible }: any) => {
     return (
         <Modal
             animationType="slide"

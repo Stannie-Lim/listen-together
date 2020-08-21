@@ -85,44 +85,41 @@ export default function BottomTabNavigator({route}: any) {
   }, []);
 
   const enqueueSong = async song => {
-    // //play song
-    // console.log(song.uri);
-    // Audio.setAudioModeAsync({ 
-    //   playsInSilentModeIOS: true
-    // });
-    // const soundObject = new Audio.Sound();
-    // try {
-    //   const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-    //   const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-    //   await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player', { device_ids: [device.id] });
-    //   const currentSong = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player'))?.data;
-    //   const playing = currentSong.item.uri === song.uri;
-    //   let temp = false;
-    //   console.log(playing);
-    //   if(!playing) {
-    //     await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: [song.uri], device_id: device.id } )
-    //     console.log('hello');
-    //   } else {
-    //     await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player/pause');
-    //     temp = true;
-    //   }
+    try {
+      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+      if(!device) {
+          alert('Please play a song on Spotify first');
+          return;
+      }
+      queue.enqueue(song);
+      const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
+      const newqueue = new SongQueue(JSON.parse(songQueue));
+      
+      setQueue(newqueue);
+      mysocket.emit('queuesong', newqueue);
+    } catch(err) {
+      console.log(err);
+    }
+  };
 
-    //   if(temp) {
-    //     await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`);
-    //     temp = false;
-    //   }
-
-
-    // } catch(err) {
-    //   console.log(Object.entries(err));
-    // }
-
-    queue.enqueue(song);
-    const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
-    const newqueue = new SongQueue(JSON.parse(songQueue));
-    
-    setQueue(newqueue);
-    mysocket.emit('queuesong', newqueue);
+  const enqueuePlaylist = async playlist => {
+    try {
+      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+      if(!device) {
+          alert('Please play a song on Spotify first');
+          return;
+      }
+      playlist.forEach(song => queue.enqueue(song));
+      const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
+      const newqueue = new SongQueue(JSON.parse(songQueue));
+      
+      setQueue(newqueue);
+      mysocket.emit('queuesong', newqueue);
+    } catch(err) {
+      console.log(err);
+    } 
   };
 
   const emitIntersection = intersection => {
@@ -215,7 +212,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <SimpleLineIcons name="playlist" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabTwoNavigator leaveSocket={ leaveSocket } playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabTwoNavigator leaveSocket={ leaveSocket } playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueuePlaylist={ enqueuePlaylist } enqueueSong={ enqueueSong } user={ me } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -224,7 +221,7 @@ export default function BottomTabNavigator({route}: any) {
           tabBarIcon: ({ color }) => <AntDesign name="search1" size={24} color={color} />
         }}
       >
-        { ({ navigation }: any) => <TabThreeNavigator leaveSocket={ leaveSocket } user={ me } enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
+        { ({ navigation }: any) => <TabThreeNavigator leaveSocket={ leaveSocket } user={ me } enqueuePlaylist= { enqueuePlaylist } enqueueSong={ enqueueSong } queue={ queue } setQueue={ setQueue } navigation={ navigation } roomCode={ roomCode } /> }
       </BottomTab.Screen>
 
       <BottomTab.Screen
@@ -275,7 +272,7 @@ function TabOneNavigator({ leaveSocket, user, socket, queue, setQueue, navigatio
 
 const TabTwoStack = createStackNavigator<PlaylistParamList>();
 
-function TabTwoNavigator({ leaveSocket, playlists, intersectionPlaylist, emitIntersection, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
+function TabTwoNavigator({ leaveSocket, playlists, enqueuePlaylist, intersectionPlaylist, emitIntersection, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
@@ -285,7 +282,7 @@ function TabTwoNavigator({ leaveSocket, playlists, intersectionPlaylist, emitInt
           headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
-        { () => <Playlists playlists={ playlists } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
+        { () => <Playlists playlists={ playlists } enqueuePlaylist={ enqueuePlaylist } intersectionPlaylist={ intersectionPlaylist } emitIntersection={ emitIntersection } enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } roomCode={ roomCode } /> }
       </TabTwoStack.Screen>
     </TabTwoStack.Navigator>
   );
@@ -293,7 +290,7 @@ function TabTwoNavigator({ leaveSocket, playlists, intersectionPlaylist, emitInt
 
 const TabThreeStack = createStackNavigator<SearchParamList>();
 
-function TabThreeNavigator({ leaveSocket, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
+function TabThreeNavigator({ enqueuePlaylist, leaveSocket, enqueueSong, user, queue, setQueue, navigation, roomCode }: Props) {
   return (
     <TabThreeStack.Navigator>
       <TabThreeStack.Screen
@@ -303,7 +300,7 @@ function TabThreeNavigator({ leaveSocket, enqueueSong, user, queue, setQueue, na
           headerLeft: () => leaveRoom(navigation, user.id, leaveSocket)
         }}
       >
-        { () => <Search enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } /> }
+        { () => <Search enqueuePlaylist={ enqueuePlaylist } enqueueSong={ enqueueSong } user={ user } queue={ queue } setQueue={ setQueue } /> }
       </TabThreeStack.Screen>
     </TabThreeStack.Navigator>
   );

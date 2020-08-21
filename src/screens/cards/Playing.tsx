@@ -18,11 +18,18 @@ export const Playing = ( { queue, song }: any ) => {
 
     const playFirstSong = async() => {
         try {
-            if(queue.queue.length === 1) {
-                await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: [song.uri] } )
+            const { is_playing } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player'))?.data;
+            if(!is_playing) {
+                if(queue.queue.length === 1) {
+                    await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: [song.uri] } )
+                } else {
+                    const songUris = queue.queue.map(song => song.uri);
+                    await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: songUris } )
+                }
             } else {
                 const songUris = queue.queue.map(song => song.uri);
-                await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: songUris } )
+                const { progress_ms } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/currently-playing'))?.data;
+                await AxiosHttpRequest('PUT', `https://api.spotify.com/v1/me/player/play`, { uris: songUris, position_ms: progress_ms } )
             }
         } catch(err) {
             console.log(err);
@@ -55,13 +62,6 @@ export const Playing = ( { queue, song }: any ) => {
 
     const playorpause = async() => {
         try {
-            const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-            const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-
-            // if(!device) {
-            //     setCurrentDevice(false);
-            //     return;
-            // }
             const { is_playing } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player'))?.data;
             if(is_playing) {
                 await AxiosHttpRequest('PUT', 'https://api.spotify.com/v1/me/player/pause');
