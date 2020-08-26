@@ -1,4 +1,3 @@
-import io from 'socket.io-client';
 import { Props } from '../../../types';
 import { API_URL } from '../../../secrets';
 import React, { useEffect, useState } from 'react';
@@ -14,15 +13,11 @@ export const CreateRoom = ({ navigation }: Props) => {
     }, []);
 
     const createRoom = async() => {
-        const socket = io.connect(API_URL);
         const roomCode = (await AxiosHttpRequest('POST', `${API_URL}/room`, { id: me.id } ))?.data.id;
+        const queue = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`))?.data;
         await AxiosHttpRequest('POST', `${API_URL}/user/join/${roomCode}`, { id: me.id });
 
-        socket.on('connect', () => {
-            socket.emit('newuser', me);
-        });
-
-        navigation.navigate('Room', { roomCode });
+        navigation.navigate('Room', { roomCode, queueId: queue.id });
     };
 
     return (

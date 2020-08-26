@@ -29,10 +29,10 @@ const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const mysocket = io(SOCKET_URL);
 
 export default function BottomTabNavigator({route}: any) {
-  const { roomCode } = route.params;
+  const { roomCode, queueId } = route.params;
   const [ me, setMe ] = useState({});
   const [ users, setUsers ]: any[] = useState([]);
-  const [ queue, setQueue ] = useState(new SongQueue);
+  const [ queue, setQueue ] = useState([]);
   const [ playlists, setPlaylists ]: any[] = useState([]);
   const [ intersectionPlaylist, setIntersectionPlaylist ]: any[] = useState([]);
   
@@ -52,7 +52,7 @@ export default function BottomTabNavigator({route}: any) {
       const { data } = (await AxiosHttpRequest('GET', `${API_URL}/auth/me`));
       return data;
     }
-    const getme = async() => await getUser(setMe);
+    const getme = async() => await getUser();
     getme();
     getPlaylists();
 
@@ -85,41 +85,48 @@ export default function BottomTabNavigator({route}: any) {
   }, []);
 
   const enqueueSong = async song => {
-    try {
-      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-      if(!device) {
-          alert('Please play a song on Spotify first');
-          return;
-      }
-      queue.enqueue(song);
-      const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
-      const newqueue = new SongQueue(JSON.parse(songQueue));
-      
-      setQueue(newqueue);
-      mysocket.emit('queuesong', newqueue);
+    try { 
+      const { data } = await AxiosHttpRequest('POST', `${API_URL}/song`, { name: song.name, artist: song.artists[0].name, spotifyUri: song.uri, imageUri: song.album.images[0].url });
+      const addtoqueue = (await AxiosHttpRequest('POST', `${API_URL}/song/addtoqueue/${data.id}`, { queueId }))?.data;
+      console.log(addtoqueue);
     } catch(err) {
       console.log(err);
     }
+    // try {
+    //   const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+    //   const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+    //   if(!device) {
+    //       alert('Please play a song on Spotify first');
+    //       return;
+    //   }
+    //   queue.enqueue(song);
+    //   const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
+    //   const newqueue = new SongQueue(JSON.parse(songQueue));
+      
+    //   setQueue(newqueue);
+    //   mysocket.emit('queuesong', newqueue);
+    // } catch(err) {
+    //   console.log(err);
+    // }
   };
 
   const enqueuePlaylist = async playlist => {
-    try {
-      const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-      const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-      if(!device) {
-          alert('Please play a song on Spotify first');
-          return;
-      }
-      playlist.forEach(song => queue.enqueue(song));
-      const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
-      const newqueue = new SongQueue(JSON.parse(songQueue));
+    // try {
+    //   const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
+    //   const device = devices.find(mydevice => mydevice.type === 'Smartphone');
+    //   if(!device) {
+    //       alert('Please play a song on Spotify first');
+    //       return;
+    //   }
+    //   playlist.forEach(song => queue.enqueue(song));
+    //   const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
+    //   const newqueue = new SongQueue(JSON.parse(songQueue));
       
-      setQueue(newqueue);
-      mysocket.emit('queuesong', newqueue);
-    } catch(err) {
-      console.log(err);
-    } 
+    //   setQueue(newqueue);
+    //   mysocket.emit('queuesong', newqueue);
+    // } catch(err) {
+    //   console.log(err);
+    // } 
   };
 
   const emitIntersection = intersection => {

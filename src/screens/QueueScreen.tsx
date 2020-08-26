@@ -20,24 +20,14 @@ export default function QueueScreen({ queue, setQueue }: any) {
 
   };
   return (
-    queue.queue.length === 0 ?
+    // queue.queue.length === 0 ?
     <View>
       <Text style={styles.title}>There are no songs in the queue right now!</Text>
       {/* <View style={ styles.playing }>
         <Playing />
       </View> */}
     </View>
-    :
-      <View>
-        <ScrollView style={ styles.list }>
-          {
-            queue.queue && queue.queue.length !== 0 && queue.queue.map((song: any, index: number) => <SongsCard key={ index } clickable={ false } song={ song } />)
-          } 
-        </ScrollView>
-        <View style={ styles.playing }>
-          <Playing song={ queue.peek() } queue={ queue } />
-        </View>
-      </View>
+
   );
 }
 
