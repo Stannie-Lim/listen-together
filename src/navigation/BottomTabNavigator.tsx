@@ -87,8 +87,8 @@ export default function BottomTabNavigator({route}: any) {
   const enqueueSong = async song => {
     try { 
       const { data } = await AxiosHttpRequest('POST', `${API_URL}/song`, { name: song.name, artist: song.artists[0].name, spotifyUri: song.uri, imageUri: song.album.images[0].url });
-      const addtoqueue = (await AxiosHttpRequest('POST', `${API_URL}/song/addtoqueue/${data.id}`, { queueId }))?.data;
-      console.log(addtoqueue);
+      const { songs } = (await AxiosHttpRequest('POST', `${API_URL}/song/addtoqueue/${data.id}`, { queueId }))?.data;
+      setQueue(songs);
     } catch(err) {
       console.log(err);
     }
@@ -111,22 +111,11 @@ export default function BottomTabNavigator({route}: any) {
   };
 
   const enqueuePlaylist = async playlist => {
-    // try {
-    //   const { devices } = (await AxiosHttpRequest('GET', 'https://api.spotify.com/v1/me/player/devices'))?.data;
-    //   const device = devices.find(mydevice => mydevice.type === 'Smartphone');
-    //   if(!device) {
-    //       alert('Please play a song on Spotify first');
-    //       return;
-    //   }
-    //   playlist.forEach(song => queue.enqueue(song));
-    //   const { songQueue } = (await AxiosHttpRequest('POST', `${API_URL}/queue/${roomCode}`, { queue: JSON.stringify(queue.queue) }))?.data;
-    //   const newqueue = new SongQueue(JSON.parse(songQueue));
-      
-    //   setQueue(newqueue);
-    //   mysocket.emit('queuesong', newqueue);
-    // } catch(err) {
-    //   console.log(err);
-    // } 
+    const minimalized = playlist.map(song => { 
+      return { name: song.name, artist: song.artists[0].name, spotifyUri: song.uri, imageUri: song.album.images[0].url }
+    });
+    const queue = (await AxiosHttpRequest('POST', `${API_URL}/song/playlist`, { playlist: minimalized, queueId }))?.data;
+    setQueue(queue);
   };
 
   const emitIntersection = intersection => {

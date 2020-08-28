@@ -4,12 +4,13 @@ import { getUserId, getUser } from '../utils/axios';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView } from 'react-native';
 
 // cards
-import { SongsCard } from './cards/SongsCard';
+import { QueueSongCard } from './cards/QueueSongCard';
 
 // components
 import { Playing } from './cards/Playing';
 
 export default function QueueScreen({ queue, setQueue }: any) {
+  console.log(queue, 'hello');
   useEffect( () => {
     findPlaying();
   }, []);
@@ -20,14 +21,13 @@ export default function QueueScreen({ queue, setQueue }: any) {
 
   };
   return (
-    // queue.queue.length === 0 ?
-    <View>
-      <Text style={styles.title}>There are no songs in the queue right now!</Text>
-      {/* <View style={ styles.playing }>
-        <Playing />
-      </View> */}
-    </View>
-
+    queue.length !== 0 ?
+    <ScrollView>
+      {
+        queue.map(song => <QueueSongCard song={ song } />)
+      }
+    </ScrollView>
+    : <Text />
   );
 }
 

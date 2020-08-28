@@ -7,18 +7,16 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'rea
 // modals
 import { Avatar } from '../common/Avatar';
 
-export const SongsCard = ({ enqueueSong, song }: any) => {
-    // console.log(song);
-    const imageUri = song.album.images[0].url !== null ? song.album.images[0].url : ""
+export const QueueSongCard = ({ song }: any) => {
     return (
-        <TouchableOpacity onPress={ () => enqueueSong(song) } style={ styles.container }>
-            <Avatar imageUri={ imageUri } />
+        <View style={ styles.container }>
+            <Avatar imageUri={ song.imageUri } />
             <View style={ styles.information }>
                 <Text style={ styles.name }>{ song.name }</Text>
-                <Text style={ styles.artist }>{ song.artists[0].name }</Text>
+                <Text style={ styles.artist }>{ song.artist }</Text>
             </View>
-        </TouchableOpacity> 
-    );
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
